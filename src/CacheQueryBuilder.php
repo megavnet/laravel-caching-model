@@ -1,13 +1,13 @@
 <?php
 
-namespace Hacoidev\CachingModel;
+namespace Megavnet\CachingModel;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use \Hacoidev\CachingModel\Contracts\BuilderInterface;
+use \Megavnet\CachingModel\Contracts\BuilderInterface;
 use Closure;
-use \Hacoidev\CachingModel\Contracts\Cacheable;
-use \Hacoidev\CachingModel\Exceptions\UnsupportedModelException;
+use \Megavnet\CachingModel\Contracts\Cacheable;
+use \Megavnet\CachingModel\Exceptions\UnsupportedModelException;
 
 class CacheQueryBuilder implements BuilderInterface
 {

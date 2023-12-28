@@ -1,11 +1,11 @@
 <?php
 
-namespace Hacoidev\CachingModel;
+namespace Megavnet\CachingModel;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use \Hacoidev\CachingModel\Contracts\BuilderInterface;
-use Hacoidev\CachingModel\Contracts\Cacheable;
+use \Megavnet\CachingModel\Contracts\BuilderInterface;
+use Megavnet\CachingModel\Contracts\Cacheable;
 
 trait HasCache
 {
@@ -35,7 +35,7 @@ trait HasCache
             static::flushRelationship($instance);
         });
 
-        if (method_exists(statis::class, 'trashed')) {
+        if (method_exists(static::class, 'trashed')) {
             static::restored(function ($instance) {
                 Cache::forget(static::getCacheKey($instance->{static::primaryCacheKey()}));
                 static::flushRelationship($instance);

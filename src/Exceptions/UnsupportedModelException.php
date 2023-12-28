@@ -1,6 +1,6 @@
 <?php
 
-namespace Hacoidev\CachingModel\Exceptions;
+namespace Megavnet\CachingModel\Exceptions;
 
 use Exception;
 
