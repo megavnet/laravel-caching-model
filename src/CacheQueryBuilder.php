@@ -21,7 +21,7 @@ class CacheQueryBuilder implements BuilderInterface
     public function __construct(string $model)
     {
         if (!in_array(Cacheable::class, class_implements($model))) {
-            throw new UnsupportedModelException();
+            // throw new UnsupportedModelException();
         }
 
         $this->model = $model;
