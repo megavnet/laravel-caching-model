@@ -26,11 +26,17 @@ trait HasCache
 
         static::updated(function ($instance) {
             Cache::forget(static::getCacheKey($instance->{static::primaryCacheKey()}));
+            if (static::secondaryCacheKey()) {
+                Cache::forget(static::getCacheKey($instance->{static::secondaryCacheKey()}, static::secondaryCacheKey()));
+            }
             static::flushRelationship($instance);
         });
 
         static::deleted(function ($instance) {
             Cache::forget(static::getCacheKey($instance->{static::primaryCacheKey()}));
+            if (static::secondaryCacheKey()) {
+                Cache::forget(static::getCacheKey($instance->{static::secondaryCacheKey()}, static::secondaryCacheKey()));
+            }
             Cache::forget(static::getCacheKeyList());
             static::flushRelationship($instance);
         });
@@ -38,6 +44,9 @@ trait HasCache
         if (method_exists(static::class, 'trashed')) {
             static::restored(function ($instance) {
                 Cache::forget(static::getCacheKey($instance->{static::primaryCacheKey()}));
+                if (static::secondaryCacheKey()) {
+                    Cache::forget(static::getCacheKey($instance->{static::secondaryCacheKey()}));
+                }
                 static::flushRelationship($instance);
             });
         }
@@ -46,6 +55,11 @@ trait HasCache
     public static function primaryCacheKey(): string
     {
         return 'id';
+    }
+
+    public static function secondaryCacheKey(): string|null
+    {
+        return null;
     }
 
     public static function getCacheKey($id, string $key = null): string
@@ -72,7 +86,7 @@ trait HasCache
         return $query;
     }
 
-    final public static function fromCache(): BuilderInterface
+    final public static function fromCache(): CacheQueryBuilder
     {
         return new CacheQueryBuilder(static::class);
     }
@@ -85,9 +99,15 @@ trait HasCache
             $oldRelation = $origin->{$relation};
             if ($newRelation instanceof Cacheable) {
                 Cache::forget($newRelation->getCacheKey($newRelation->{$newRelation->primaryCacheKey()}));
+                if ($newRelation->secondaryCacheKey()) {
+                    Cache::forget($newRelation->getCacheKey($newRelation->{$newRelation->secondaryCacheKey()}));
+                }
             }
             if ($oldRelation instanceof Cacheable) {
                 Cache::forget($oldRelation->getCacheKey($oldRelation->{$oldRelation->primaryCacheKey()}));
+                if ($oldRelation->secondaryCacheKey()) {
+                    Cache::forget($oldRelation->getCacheKey($oldRelation->{$oldRelation->secondaryCacheKey()}));
+                }
             }
         }
     }

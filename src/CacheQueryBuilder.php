@@ -15,6 +15,8 @@ class CacheQueryBuilder implements BuilderInterface
 
     protected $cacheKey;
 
+    protected $secondaryCacheKey;
+
     /**
      * @throws UnsupportedModelException
      */
@@ -27,12 +29,17 @@ class CacheQueryBuilder implements BuilderInterface
         $this->model = $model;
 
         $this->cacheKey = $this->model::primaryCacheKey();
+        $this->secondaryCacheKey = $this->model::secondaryCacheKey();
     }
 
     public function find($value)
     {
         return Cache::remember($this->model::getCacheKey($value, $this->getCacheKey()), $this->model::cacheTimeout(), function () use ($value) {
-            return $this->model::cacheWithRelation()->where($this->getCacheKey(), $value)->first();
+            $result = $this->model::cacheWithRelation()->where($this->getCacheKey(), $value)->first();
+            if ($this->getsSecondaryCacheKey()) {
+                Cache::put($this->model::getCacheKey($result->{$this->getsSecondaryCacheKey()}, $this->getsSecondaryCacheKey()), $result, $this->model::cacheTimeout());
+            }
+            return $result;
         });
     }
 
@@ -48,10 +55,20 @@ class CacheQueryBuilder implements BuilderInterface
         return $this->cacheKey;
     }
 
+    protected function getsSecondaryCacheKey(): string|null
+    {
+        return $this->secondaryCacheKey;
+    }
+
     public function findByKey($key, $value)
     {
-        return Cache::remember($this->model::getCacheKey($value, $key), $this->model::cacheTimeout(), function () use ($value, $key) {
-            return $this->model::cacheWithRelation()->where($key, $value)->first();
+        $cache_key = $this->model::getCacheKey($value, $key);
+        return Cache::remember($cache_key, $this->model::cacheTimeout(), function () use ($value, $key) {
+            $result = $this->model::cacheWithRelation()->where($key, $value)->first();
+            if ($result && $this->getsSecondaryCacheKey() && $key == $this->getsSecondaryCacheKey()) {
+                Cache::put($this->model::getCacheKey($result->{$this->cacheKey}, $this->getCacheKey()), $result, $this->model::cacheTimeout());
+            }
+            return $result;
         });
     }
 

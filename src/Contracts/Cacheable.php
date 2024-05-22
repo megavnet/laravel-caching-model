@@ -8,6 +8,8 @@ interface Cacheable
 {
     public static function primaryCacheKey(): string;
 
+    public static function secondaryCacheKey(): string|null;
+
     public static function getCacheKey($id, string $key = null): string;
 
     public static function getCacheKeyList(): string;
