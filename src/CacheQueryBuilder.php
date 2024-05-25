@@ -36,7 +36,7 @@ class CacheQueryBuilder implements BuilderInterface
     {
         return Cache::remember($this->model::getCacheKey($value, $this->getCacheKey()), $this->model::cacheTimeout(), function () use ($value) {
             $result = $this->model::cacheWithRelation()->where($this->getCacheKey(), $value)->first();
-            if ($this->getsSecondaryCacheKey()) {
+            if ($result && $this->getsSecondaryCacheKey()) {
                 Cache::put($this->model::getCacheKey($result->{$this->getsSecondaryCacheKey()}, $this->getsSecondaryCacheKey()), $result, $this->model::cacheTimeout());
             }
             return $result;
