@@ -16,7 +16,7 @@ trait HasCache
         });
 
         static::deleting(function ($instance) {
-            static::flushRelationship($instance);
+            // static::flushRelationship($instance);
         });
 
         static::created(function ($instance) {
